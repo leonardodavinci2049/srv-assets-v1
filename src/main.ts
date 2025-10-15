@@ -5,7 +5,7 @@ import { envs } from './core/config/envs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const loggerApp = new Logger('WSERPADMIN');
+  const loggerApp = new Logger('SRV-ASSETS');
 
   // Set the global prefix for all routes
   app.setGlobalPrefix('api');
@@ -22,15 +22,17 @@ async function bootstrap() {
     }),
   );
 
-  // security measure to only make available the listed methods
+  // Security measure to only make available the listed methods
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept',
+    allowedHeaders: 'Content-Type, Accept, X-API-Key',
   });
 
   await app.listen(process.env.APP_PORT ?? 3000);
-  loggerApp.log(`Application is running on port: ${envs.APP_PORT}`);
+  loggerApp.log(`🚀 Application is running on port: ${envs.APP_PORT}`);
+  loggerApp.log(`📚 Documentation: ${envs.APP_API_URL}`);
+  loggerApp.log(`📁 Upload endpoint: ${envs.APP_API_URL}/api/file/upload`);
 }
 // Start the application
 void bootstrap();

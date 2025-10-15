@@ -4,6 +4,7 @@ interface EnvVars {
   APP_API_URL: string;
   APP_API_SECRET: string;
   APP_PORT: number;
+  DATABASE_URL: string;
 }
 
 const envsSchema = joi
@@ -11,6 +12,7 @@ const envsSchema = joi
     APP_API_URL: joi.string().required(),
     APP_API_SECRET: joi.string().required(),
     APP_PORT: joi.number().positive().required(),
+    DATABASE_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -29,4 +31,5 @@ export const envs = {
   APP_API_URL: validatedEnvs.APP_API_URL,
   APP_API_SECRET: validatedEnvs.APP_API_SECRET,
   APP_PORT: validatedEnvs.APP_PORT,
+  DATABASE_URL: validatedEnvs.DATABASE_URL,
 } satisfies EnvVars;
