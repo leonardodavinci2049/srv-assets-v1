@@ -1,179 +1,171 @@
 # 🖼️ srv-assets-v1
 
-**API REST para Upload/Download de Arquivos e Servidor de Assets Estáticos**
+**REST API for File Upload/Download and Static Assets Server**
 
-Sistema completo de gerenciamento de assets (imagens, documentos, planilhas) construído com NestJS, TypeScript, Prisma e MariaDB.
+Complete asset management system (images, documents, spreadsheets) built with NestJS, TypeScript, Prisma, and MariaDB.
 
 ---
 
-## 🎯 Funcionalidades
+## 🎯 Features
 
-- ✅ **Upload de múltiplos tipos de arquivo** (imagens, documentos, planilhas)
-- ✅ **Processamento automático de imagens** (thumbnail + preview)
-- ✅ **Armazenamento organizado** por tipo, data e UUID
-- ✅ **API REST completa** com validação e segurança
-- ✅ **Servidor de assets estáticos** para download público
-- ✅ **Persistência de metadados** com MariaDB + Prisma
-- ✅ **Sistema de tags** e relacionamento com entidades externas
-- ✅ **Logs de auditoria** completos
-- ✅ **Interface web** para upload e visualização
+- ✅ **Multiple file type uploads** (images, documents, spreadsheets)
+- ✅ **Automatic image processing** (thumbnail + preview)
+- ✅ **Organized storage** by type, date, and UUID
+- ✅ **Complete REST API** with validation and security
+- ✅ **Static assets server** for public downloads
+- ✅ **Metadata persistence** with MariaDB + Prisma
+- ✅ **Tag system** and external entity relationships
+- ✅ **Complete audit logs**
+- ✅ **Web interface** for upload and visualization
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Pré-requisitos
+### 1. Prerequisites
 
 - Node.js 18+
 - pnpm
-- MariaDB 10.5+ ou MySQL 8+
+- MariaDB 10.5+ or MySQL 8+
 
-### 2. Instalação
+### 2. Installation
 
 ```bash
-# Clonar repositório
+# Clone repository
 git clone <repo-url>
 cd srv-assets-v1
 
-# Instalar dependências
+# Install dependencies
 pnpm install
-
-# Instalar dependências adicionais
-pnpm add multer @types/multer sharp file-type sanitize-filename
 ```
 
-### 3. Configuração
+### 3. Configuration
 
 ```bash
-# Copiar variáveis de ambiente
+# Copy environment variables
 cp .env.example .env
 
-# Editar .env com suas credenciais de banco
-# DATABASE_URL="mysql://usuario:senha@localhost:3306/srv_images101?charset=utf8mb4&timezone=UTC"
+# Edit .env with your database credentials
+# DATABASE_URL="mysql://user:password@localhost:3306/srv_assets?charset=utf8mb4&timezone=UTC"
 ```
 
-### 4. Banco de Dados
+### 4. Database Setup
 
 ```bash
-# Criar database
+# Create database
 mysql -u root -p
-CREATE DATABASE srv_images101 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE srv_assets CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-# Executar migrations
+# Run migrations
 npx prisma migrate dev
 
-# Gerar Prisma Client
+# Generate Prisma Client
 npx prisma generate
 ```
 
-### 5. Executar
+### 5. Run
 
 ```bash
-# Desenvolvimento
+# Development
 pnpm run dev
 
-# Produção
+# Production
 pnpm run build
 pnpm run start:prod
 ```
 
-Acesse:
+Access:
 
 - **API:** <http://localhost:3000/api>
-- **Interface Web:** <http://localhost:3000/upload>
+- **Web Interface:** <http://localhost:3000/upload>
 - **Prisma Studio:** `npx prisma studio`
 
 ---
 
-## 📚 Documentação
+## 📚 Documentation
 
-### Documentos Principais
+### Main Documents
 
-- **📋 [Resumo Executivo](docs/RESUMO.md)** - Visão geral e decisões técnicas
-- **📖 [Plano de Implementação Completo](docs/implementacao-definida.md)** - Documento técnico detalhado (60+ páginas)
-- **🛠️ [Guia de Implementação](docs/IMPLEMENTATION_GUIDE.md)** - Passo a passo prático
-- **📄 [Análise Original](docs/analise-e-definicoes-projeto.md)** - Análise e opções avaliadas
-- **✅ [Opções Selecionadas](docs/selected-options.md)** - Decisões tomadas
-
-### Schema do Banco
-
-- **📐 [Prisma Schema](prisma/schema.prisma)** - Estrutura completa do banco de dados
+- **📋 [Executive Summary](docs/RESUMO.md)** - Overview and technical decisions
+- **📖 [Complete Implementation Plan](docs/implementacao-definida.md)** - Detailed technical document (60+ pages)
+- **🛠️ [Implementation Guide](docs/IMPLEMENTATION_GUIDE.md)** - Step-by-step practical guide
+- **📐 [Prisma Schema](prisma/schema.prisma)** - Complete database structure
 
 ---
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
-### Stack Tecnológica
+### Technology Stack
 
-| Camada | Tecnologia |
-|--------|-----------|
+| Layer | Technology |
+|-------|-----------|
 | **Framework** | NestJS 11.x |
-| **Linguagem** | TypeScript 5.7.3 |
+| **Language** | TypeScript 5.7.3 |
 | **Runtime** | Node.js + Express |
-| **Banco de Dados** | MariaDB + Prisma ORM |
+| **Database** | MariaDB + Prisma ORM |
 | **Upload** | Multer |
-| **Processamento de Imagens** | Sharp |
-| **Validação** | class-validator + file-type |
+| **Image Processing** | Sharp |
+| **Validation** | class-validator + file-type |
 | **Rate Limiting** | @nestjs/throttler |
 
-### Estrutura de Diretórios
+### Directory Structure
 
 ```
 srv-assets-v1/
 ├── src/
-│   ├── app.main/          # Módulo principal
-│   ├── core/              # Configurações e guards
-│   ├── file/              # Módulo de arquivos (principal)
-│   ├── image/             # Processamento de imagens
-│   ├── storage/           # Gestão de storage
+│   ├── app.main/          # Main module
+│   ├── core/              # Configuration and guards
+│   ├── file/              # File module (main)
+│   ├── image/             # Image processing
+│   ├── storage/           # Storage management
 │   └── prisma/            # Prisma service
 ├── prisma/
-│   └── schema.prisma      # Schema do banco
-├── upload/                # Arquivos enviados
+│   └── schema.prisma      # Database schema
+├── upload/                # Uploaded files
 │   ├── images/
 │   ├── documents/
 │   └── spreadsheets/
-├── pageroot/              # Interface web estática
-└── docs/                  # Documentação completa
+├── pageroot/              # Static web interface
+└── docs/                  # Complete documentation
 ```
 
 ---
 
 ## 📡 API Endpoints
 
-### Autenticados (requer `X-API-Key`)
+### Authenticated (requires `X-API-Key`)
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/api/file/upload` | Upload de arquivo |
-| GET | `/api/file/list` | Listar assets com filtros |
-| GET | `/api/file/:id` | Buscar asset específico |
-| DELETE | `/api/file/:id` | Deletar asset (soft delete) |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/file/upload` | File upload |
+| GET | `/api/file/list` | List assets with filters |
+| GET | `/api/file/:id` | Get specific asset |
+| DELETE | `/api/file/:id` | Delete asset (soft delete) |
 
-### Públicos
+### Public
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/uploads/**` | Download direto de arquivos |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/uploads/**` | Direct file download |
 
-### Exemplo de Upload
+### Upload Example
 
 ```bash
 curl -X POST http://localhost:3000/api/file/upload \
-  -H "X-API-Key: sua-chave-aqui" \
-  -F "file=@produto.jpg" \
+  -H "X-API-Key: your-api-key-here" \
+  -F "file=@product.jpg" \
   -F "entityType=PRODUCT" \
   -F "entityId=550e8400-e29b-41d4-a716-446655440000" \
-  -F "tags[]=principal" \
-  -F "tags[]=destaque"
+  -F "tags[]=featured" \
+  -F "tags[]=main"
 ```
 
 **Response:**
 
 ```json
 {
-  "id": "uuid-do-asset",
-  "originalName": "produto.jpg",
+  "id": "asset-uuid",
+  "originalName": "product.jpg",
   "fileType": "IMAGE",
   "urls": {
     "original": "http://localhost:3000/uploads/images/2025/10/15/{uuid}/original.jpg",
@@ -185,68 +177,68 @@ curl -X POST http://localhost:3000/api/file/upload \
 
 ---
 
-## 🗄️ Banco de Dados
+## 🗄️ Database
 
-### Tabelas Principais
+### Main Tables
 
-1. **assets** - Metadados dos arquivos
-2. **asset_versions** - Versões (original, preview, thumbnail)
-3. **asset_tags** - Tags para organização
-4. **asset_logs** - Logs de auditoria
-5. **system_config** - Configurações do sistema
+1. **assets** - File metadata
+2. **asset_versions** - Versions (original, preview, thumbnail)
+3. **asset_tags** - Tags for organization
+4. **asset_logs** - Audit logs
+5. **system_config** - System configuration
 
-### Relacionamento Externo
+### External Relationships
 
-Cada asset possui:
+Each asset has:
 
-- `entityType`: Tipo da entidade (PRODUCT, PROFILE, ORDER, etc)
-- `entityId`: UUID do cadastro em outro banco de dados
+- `entityType`: Entity type (PRODUCT, PROFILE, ORDER, etc)
+- `entityId`: UUID of record in another database
 
-Isso permite relacionar assets com qualquer entidade externa sem acoplamento.
-
----
-
-## 🔐 Segurança
-
-- ✅ Validação de tipo MIME
-- ✅ Verificação de magic numbers (assinatura do arquivo)
-- ✅ Sanitização de nomes de arquivo
-- ✅ Rate limiting configurável
-- ✅ API Key para endpoints administrativos
-- ✅ Proteção contra path traversal
-- ✅ Logs de auditoria completos
+This allows relating assets with any external entity without coupling.
 
 ---
 
-## 📊 Configurações
+## 🔐 Security
 
-### Tipos de Arquivo Permitidos
+- ✅ MIME type validation
+- ✅ Magic number verification (file signature)
+- ✅ Filename sanitization
+- ✅ Configurable rate limiting
+- ✅ API Key for administrative endpoints
+- ✅ Path traversal protection
+- ✅ Complete audit logs
 
-- **Imagens:** JPG, PNG, GIF, WebP (máx. 2MB)
-- **Documentos:** PDF, DOC, DOCX, TXT (máx. 5MB)
-- **Planilhas:** XLS, XLSX, CSV (máx. 5MB)
+---
 
-### Processamento de Imagens
+## 📊 Configuration
 
-- **Original:** Arquivo preservado como enviado
-- **Preview:** 800x600 pixels, compressão 80%
-- **Thumbnail:** 200x200 pixels, compressão 80%
+### Allowed File Types
+
+- **Images:** JPG, PNG, GIF, WebP (max. 2MB)
+- **Documents:** PDF, DOC, DOCX, TXT (max. 5MB)
+- **Spreadsheets:** XLS, XLSX, CSV (max. 5MB)
+
+### Image Processing
+
+- **Original:** File preserved as uploaded
+- **Preview:** 800x600 pixels, 80% compression
+- **Thumbnail:** 200x200 pixels, 80% compression
 
 ### Rate Limiting
 
-- Upload: 10 arquivos/hora por IP
-- Download: 100 requisições/hora por IP
-- API Global: 500 requisições/hora
+- Upload: 10 files/hour per IP
+- Download: 100 requests/hour per IP
+- Global API: 500 requests/hour
 
 ---
 
-## 🧪 Testes
+## 🧪 Testing
 
 ```bash
-# Testes unitários
+# Unit tests
 pnpm run test
 
-# Testes e2e
+# E2E tests
 pnpm run test:e2e
 
 # Coverage
@@ -255,48 +247,47 @@ pnpm run test:cov
 
 ---
 
-## 📦 Scripts Disponíveis
+## 📦 Available Scripts
 
 ```bash
-pnpm run dev          # Modo desenvolvimento (watch)
-pnpm run build        # Build para produção
-pnpm run start:prod   # Executar produção
-pnpm run lint         # Verificar código
-pnpm run format       # Formatar código
+pnpm run dev          # Development mode (watch)
+pnpm run build        # Build for production
+pnpm run start:prod   # Run production
+pnpm run lint         # Check code
+pnpm run format       # Format code
 ```
 
-### Scripts Prisma
+### Prisma Scripts
 
 ```bash
-npx prisma migrate dev      # Criar migration
-npx prisma migrate deploy   # Aplicar migrations (produção)
-npx prisma generate         # Gerar Prisma Client
-npx prisma studio           # Interface visual do banco
+npx prisma migrate dev      # Create migration
+npx prisma migrate deploy   # Apply migrations (production)
+npx prisma generate         # Generate Prisma Client
+npx prisma studio           # Visual database interface
 ```
 
 ---
 
-## 🔧 Variáveis de Ambiente
+## 🔧 Environment Variables
 
-Principais variáveis (veja `.env.example` para lista completa):
+Main variables (see `.env.example` for complete list):
 
 ```env
-# Aplicação
+# Application
+APP_API_URL=http://localhost:3000
+APP_API_SECRET=your-secret-key-here
 APP_PORT=3000
 NODE_ENV=development
 
-# Segurança
-API_KEY=sua-chave-secreta
-
-# Banco de Dados
-DATABASE_URL="mysql://root:password@localhost:3306/srv_images101?charset=utf8mb4&timezone=UTC"
+# Database
+DATABASE_URL="mysql://user:password@localhost:3306/srv_assets?charset=utf8mb4&timezone=UTC"
 
 # Upload
 UPLOAD_MAX_FILE_SIZE_IMAGE=2097152        # 2MB
 UPLOAD_MAX_FILE_SIZE_DOCUMENT=5242880     # 5MB
 UPLOAD_PATH=./upload
 
-# Imagens
+# Images
 IMAGE_GENERATE_THUMBNAIL=true
 IMAGE_THUMBNAIL_WIDTH=200
 IMAGE_PREVIEW_WIDTH=800
@@ -304,9 +295,9 @@ IMAGE_PREVIEW_WIDTH=800
 
 ---
 
-## 🚀 Deploy
+## 🚀 Deployment
 
-### Docker (Futuro)
+### Docker (Future)
 
 ```bash
 # Build
@@ -318,71 +309,71 @@ docker-compose up -d
 
 ### Manual
 
-1. Configurar servidor com Node.js 18+
-2. Instalar MariaDB
-3. Clonar repositório
-4. Configurar `.env`
-5. Executar migrations: `npx prisma migrate deploy`
+1. Set up server with Node.js 18+
+2. Install MariaDB
+3. Clone repository
+4. Configure `.env`
+5. Run migrations: `npx prisma migrate deploy`
 6. Build: `pnpm run build`
-7. Iniciar: `pnpm run start:prod`
+7. Start: `pnpm run start:prod`
 
 ---
 
 ## 📈 Roadmap
 
-### Fase 1 - MVP ✅ (Atual)
+### Phase 1 - MVP ✅ (Current)
 
-- Upload de arquivos
-- Processamento de imagens
-- API REST completa
-- Banco de dados
+- File upload
+- Image processing
+- Complete REST API
+- Database
 
-### Fase 2 - Melhorias (Futuro)
+### Phase 2 - Improvements (Future)
 
 - [ ] Background jobs (Bull/BullMQ)
-- [ ] Migração para S3/MinIO
+- [ ] Migration to S3/MinIO
 - [ ] CDN integration
 - [ ] Swagger documentation
 - [ ] Health checks
-- [ ] Métricas e monitoring
+- [ ] Metrics and monitoring
 
-### Fase 3 - Escala (Futuro)
+### Phase 3 - Scale (Future)
 
-- [ ] Múltiplos workers
-- [ ] Cache Redis
+- [ ] Multiple workers
+- [ ] Redis cache
 - [ ] Queue system
-- [ ] Backup automático
+- [ ] Automatic backup
 - [ ] Docker + Kubernetes
 
 ---
 
-## 🤝 Contribuindo
+## 🤝 Contributing
 
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
+1. Fork the project
+2. Create a branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push to branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
 
 ---
 
 ## 📝 License
 
-Este projeto está sob a licença MIT.
+This project is under the MIT license.
 
 ---
 
-## 🆘 Suporte
+## 🆘 Support
 
-Para dúvidas ou problemas:
+For questions or issues:
 
-1. Consulte a [documentação completa](docs/)
-2. Verifique o [guia de implementação](docs/IMPLEMENTATION_GUIDE.md)
-3. Abra uma issue no repositório
+1. Check the [complete documentation](docs/)
+2. Review the [implementation guide](docs/IMPLEMENTATION_GUIDE.md)
+3. Open an issue in the repository
 
 ---
 
-**Desenvolvido com NestJS** 🐈
+**Built with NestJS** 🐈
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
