@@ -25,6 +25,8 @@ import {
 import { determineFileType, isImage } from './helpers/file-validation.helper';
 import { AssetStatus, FileType } from '../../generated/prisma';
 import { envs } from '../core/config/envs';
+import { AssetWithVersionsAndTags, AssetVersion } from './types/asset.types';
+import { ProcessedImage } from '../image/image.service';
 
 @Injectable()
 export class FileService {
@@ -154,13 +156,22 @@ export class FileService {
     originalPath: string,
     outputDir: string,
   ): Promise<void> {
-    const processed = await this.imageService.processImage(
+    const processed: ProcessedImage = await this.imageService.processImage(
       originalPath,
       outputDir,
     );
 
     // Create version records
-    const versions = [
+    const versions: Array<{
+      assetId: string;
+      versionType: string;
+      fileName: string;
+      filePath: string;
+      fileSize: number;
+      width?: number;
+      height?: number;
+      isProcessed: boolean;
+    }> = [
       {
         assetId,
         versionType: 'original',
@@ -334,27 +345,29 @@ export class FileService {
   /**
    * Map Prisma asset to response DTO
    */
-  private mapToResponseDto(asset: any): FileResponseDto {
+  private mapToResponseDto(asset: AssetWithVersionsAndTags): FileResponseDto {
     const dateParts = getDateParts();
 
-    const versions: AssetVersionDto[] = asset.versions.map((v: any) => ({
-      versionType: v.versionType,
-      fileName: v.fileName,
-      url: buildPublicUrl(
-        envs.APP_API_URL,
-        asset.fileType,
-        dateParts.year,
-        dateParts.month,
-        dateParts.day,
-        asset.id,
-        v.fileName,
-      ),
-      fileSize: v.fileSize,
-      width: v.width,
-      height: v.height,
-    }));
+    const versions: AssetVersionDto[] = asset.versions.map(
+      (v: AssetVersion) => ({
+        versionType: v.versionType,
+        fileName: v.fileName,
+        url: buildPublicUrl(
+          envs.APP_API_URL,
+          asset.fileType,
+          dateParts.year,
+          dateParts.month,
+          dateParts.day,
+          asset.id,
+          v.fileName,
+        ),
+        fileSize: v.fileSize,
+        width: v.width ?? undefined,
+        height: v.height ?? undefined,
+      }),
+    );
 
-    const urls: any = {};
+    const urls: Record<string, string> = {};
     versions.forEach((v) => {
       urls[v.versionType] = v.url;
     });
@@ -369,9 +382,13 @@ export class FileService {
       fileSize: asset.fileSize,
       status: asset.status,
       uploadedAt: asset.uploadedAt,
-      tags: asset.tags.map((t: any) => t.tag),
+      tags: asset.tags.map((t) => t.tag),
       versions,
-      urls,
+      urls: urls as {
+        original: string;
+        preview?: string;
+        thumbnail?: string;
+      },
     };
   }
 }

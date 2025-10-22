@@ -19,7 +19,7 @@ export class StorageService {
 
       this.logger.log(`File saved successfully: ${destinationPath}`);
     } catch (error) {
-      this.logger.error(`Failed to save file: ${error.message}`);
+      this.logger.error(`Failed to save file: ${(error as Error).message}`);
       throw error;
     }
   }
@@ -37,7 +37,7 @@ export class StorageService {
 
       this.logger.log(`File moved successfully: ${destinationPath}`);
     } catch (error) {
-      this.logger.error(`Failed to move file: ${error.message}`);
+      this.logger.error(`Failed to move file: ${(error as Error).message}`);
       throw error;
     }
   }
@@ -50,7 +50,7 @@ export class StorageService {
       await fs.unlink(filePath);
       this.logger.log(`File deleted successfully: ${filePath}`);
     } catch (error) {
-      this.logger.error(`Failed to delete file: ${error.message}`);
+      this.logger.error(`Failed to delete file: ${(error as Error).message}`);
       throw error;
     }
   }
@@ -63,7 +63,9 @@ export class StorageService {
       await fs.rm(dirPath, { recursive: true, force: true });
       this.logger.log(`Directory deleted successfully: ${dirPath}`);
     } catch (error) {
-      this.logger.error(`Failed to delete directory: ${error.message}`);
+      this.logger.error(
+        `Failed to delete directory: ${(error as Error).message}`,
+      );
       throw error;
     }
   }

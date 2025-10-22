@@ -57,9 +57,12 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # others
 /docs
+.env.production
 tasks-project-next.md
 ecosystem.config.js
-/generated/prisma
+.well-known
 .github/copilot-instructions.md
-/generated/prisma
 /upload
+/flow
+.github
+/generated/prisma
