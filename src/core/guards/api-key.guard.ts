@@ -12,8 +12,10 @@ export class ApiKeyGuard implements CanActivate {
   private readonly logger = new Logger(ApiKeyGuard.name);
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    const apiKey = request.headers['x-api-key'];
+    const request = context
+      .switchToHttp()
+      .getRequest<Record<string, unknown>>();
+    const apiKey = (request.headers as Record<string, unknown>)['x-api-key'];
 
     if (!apiKey) {
       this.logger.warn('API Key missing in request');
@@ -21,7 +23,9 @@ export class ApiKeyGuard implements CanActivate {
     }
 
     if (apiKey !== envs.APP_API_SECRET) {
-      this.logger.warn(`Invalid API Key attempt: ${apiKey}`);
+      this.logger.warn(
+        `Invalid API Key attempt: ${typeof apiKey === 'string' ? apiKey : '[non-string value]'}`,
+      );
       throw new UnauthorizedException('Invalid API Key');
     }
 
