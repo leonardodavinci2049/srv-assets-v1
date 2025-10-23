@@ -25,6 +25,9 @@ export const IMAGE_PROCESSING = {
   GENERATE_THUMBNAIL: true,
   THUMBNAIL_WIDTH: 200,
   THUMBNAIL_HEIGHT: 200,
+  GENERATE_MEDIUM: true,
+  MEDIUM_WIDTH: 400,
+  MEDIUM_HEIGHT: 400,
   GENERATE_PREVIEW: true,
   PREVIEW_WIDTH: 800,
   PREVIEW_HEIGHT: 600,
@@ -35,6 +38,7 @@ export const IMAGE_PROCESSING = {
 export enum FileVersionType {
   ORIGINAL = 'original',
   PREVIEW = 'preview',
+  MEDIUM = 'medium',
   THUMBNAIL = 'thumbnail',
 }
 

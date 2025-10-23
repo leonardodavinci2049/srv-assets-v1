@@ -27,6 +27,11 @@ import { AssetStatus, FileType } from '../../generated/prisma';
 import { envs } from '../core/config/envs';
 import { AssetWithVersionsAndTags, AssetVersion } from './types/asset.types';
 import { ProcessedImage } from '../image/image.service';
+import {
+  EntityGalleryDto,
+  EntityGalleryResponseDto,
+  EntityGalleryImageDto,
+} from './dto/entity-gallery.dto';
 
 @Injectable()
 export class FileService {
@@ -197,6 +202,19 @@ export class FileService {
       });
     }
 
+    if (processed.medium) {
+      versions.push({
+        assetId,
+        versionType: 'medium',
+        fileName: 'medium.jpg',
+        filePath: processed.medium.path,
+        fileSize: processed.medium.size,
+        width: processed.medium.width,
+        height: processed.medium.height,
+        isProcessed: true,
+      });
+    }
+
     if (processed.thumbnail) {
       versions.push({
         assetId,
@@ -303,6 +321,96 @@ export class FileService {
   }
 
   /**
+   * Get entity gallery images (max 7 images for e-commerce product detail)
+   */
+  async getEntityGallery(
+    dto: EntityGalleryDto,
+  ): Promise<EntityGalleryResponseDto> {
+    const { entityType, entityId } = dto;
+
+    // Find all active image assets for the entity
+    const assets = await this.prisma.asset.findMany({
+      where: {
+        entityType,
+        entityId,
+        fileType: FileType.IMAGE,
+        status: AssetStatus.ACTIVE,
+        deletedAt: null,
+      },
+      include: {
+        versions: true,
+        tags: true,
+      },
+      orderBy: { uploadedAt: 'asc' }, // First uploaded images first for product gallery
+      take: 7, // Maximum 7 images for e-commerce gallery
+    });
+
+    // Count total images for this entity
+    const totalImages = await this.prisma.asset.count({
+      where: {
+        entityType,
+        entityId,
+        fileType: FileType.IMAGE,
+        status: AssetStatus.ACTIVE,
+        deletedAt: null,
+      },
+    });
+
+    // Map to gallery response format
+    const images: EntityGalleryImageDto[] = assets.map((asset) => {
+      const dateParts = getDateParts();
+
+      const versions: AssetVersionDto[] = asset.versions.map(
+        (v: AssetVersion) => ({
+          versionType: v.versionType,
+          fileName: v.fileName,
+          url: buildPublicUrl(
+            envs.EXTERNAL_API_ASSETS_URL,
+            asset.fileType,
+            dateParts.year,
+            dateParts.month,
+            dateParts.day,
+            asset.id,
+            v.fileName,
+          ),
+          fileSize: v.fileSize,
+          width: v.width ?? undefined,
+          height: v.height ?? undefined,
+        }),
+      );
+
+      const urls: Record<string, string> = {};
+      versions.forEach((v) => {
+        urls[v.versionType] = v.url;
+      });
+
+      return {
+        id: asset.id,
+        originalName: asset.originalName,
+        uploadedAt: asset.uploadedAt,
+        tags: asset.tags.map((t) => t.tag),
+        urls: urls as {
+          original: string;
+          preview?: string;
+          medium?: string;
+          thumbnail?: string;
+        },
+      };
+    });
+
+    this.logger.log(
+      `Gallery loaded for ${entityType}:${entityId} - ${images.length}/${totalImages} images`,
+    );
+
+    return {
+      entityType,
+      entityId,
+      totalImages,
+      images,
+    };
+  }
+
+  /**
    * Soft delete asset
    */
   async delete(
@@ -353,7 +461,7 @@ export class FileService {
         versionType: v.versionType,
         fileName: v.fileName,
         url: buildPublicUrl(
-          envs.APP_API_URL,
+          envs.EXTERNAL_API_ASSETS_URL,
           asset.fileType,
           dateParts.year,
           dateParts.month,
@@ -387,6 +495,7 @@ export class FileService {
       urls: urls as {
         original: string;
         preview?: string;
+        medium?: string;
         thumbnail?: string;
       },
     };
