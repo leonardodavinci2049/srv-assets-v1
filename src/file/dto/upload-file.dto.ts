@@ -1,11 +1,18 @@
-import { IsEnum, IsUUID, IsOptional, IsArray, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsArray,
+  IsString,
+  IsNotEmpty,
+} from 'class-validator';
 import { EntityType } from '../../../generated/prisma';
 
 export class UploadFileDto {
   @IsEnum(EntityType)
   entityType: EntityType;
 
-  @IsUUID()
+  @IsString()
+  @IsNotEmpty()
   entityId: string;
 
   @IsOptional()
