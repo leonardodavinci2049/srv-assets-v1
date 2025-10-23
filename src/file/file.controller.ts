@@ -21,6 +21,10 @@ import {
   EntityGalleryDto,
   EntityGalleryResponseDto,
 } from './dto/entity-gallery.dto';
+import {
+  UpdatePrimaryImageDto,
+  ReorderImagesDto,
+} from './dto/update-primary-image.dto';
 import { isAllowedMimeType } from './helpers/file-validation.helper';
 import { ApiKeyGuard } from 'src/core/guards/api-key.guard';
 
@@ -45,6 +49,8 @@ export class FileController {
         getOne: '/api/file/v1/find-file',
         delete: '/api/file/v1/delete-file',
         gallery: '/api/file/v1/entity-gallery',
+        setPrimary: '/api/file/v1/set-primary-image',
+        reorder: '/api/file/v1/reorder-images',
         note: 'All endpoints require x-api-key header',
       },
     };
@@ -111,5 +117,29 @@ export class FileController {
     @Body() body: EntityGalleryDto,
   ): Promise<EntityGalleryResponseDto> {
     return await this.fileService.getEntityGallery(body);
+  }
+
+  @Post('v1/set-primary-image')
+  @UseGuards(ApiKeyGuard)
+  async setPrimaryImage(
+    @Body() body: UpdatePrimaryImageDto,
+    @Req() req: Request,
+  ): Promise<{ success: boolean; message: string }> {
+    const ipAddress: string | undefined = req.ip || req.socket?.remoteAddress;
+    const userAgent: string | undefined = req.headers['user-agent'];
+
+    return await this.fileService.setPrimaryImage(body, ipAddress, userAgent);
+  }
+
+  @Post('v1/reorder-images')
+  @UseGuards(ApiKeyGuard)
+  async reorderImages(
+    @Body() body: ReorderImagesDto,
+    @Req() req: Request,
+  ): Promise<{ success: boolean; message: string }> {
+    const ipAddress: string | undefined = req.ip || req.socket?.remoteAddress;
+    const userAgent: string | undefined = req.headers['user-agent'];
+
+    return await this.fileService.reorderImages(body, ipAddress, userAgent);
   }
 }

@@ -28,28 +28,45 @@ export class ImageService {
   async processImage(
     inputPath: string,
     outputDir: string,
+    baseFilename?: string,
   ): Promise<ProcessedImage> {
     try {
       // Ensure output directory exists
       await fs.mkdir(outputDir, { recursive: true });
 
       const result: ProcessedImage = {
-        original: await this.processOriginal(inputPath, outputDir),
+        original: await this.processOriginal(
+          inputPath,
+          outputDir,
+          baseFilename,
+        ),
       };
 
       // Generate preview if enabled
       if (IMAGE_PROCESSING.GENERATE_PREVIEW) {
-        result.preview = await this.generatePreview(inputPath, outputDir);
+        result.preview = await this.generatePreview(
+          inputPath,
+          outputDir,
+          baseFilename,
+        );
       }
 
       // Generate medium if enabled
       if (IMAGE_PROCESSING.GENERATE_MEDIUM) {
-        result.medium = await this.generateMedium(inputPath, outputDir);
+        result.medium = await this.generateMedium(
+          inputPath,
+          outputDir,
+          baseFilename,
+        );
       }
 
       // Generate thumbnail if enabled
       if (IMAGE_PROCESSING.GENERATE_THUMBNAIL) {
-        result.thumbnail = await this.generateThumbnail(inputPath, outputDir);
+        result.thumbnail = await this.generateThumbnail(
+          inputPath,
+          outputDir,
+          baseFilename,
+        );
       }
 
       this.logger.log(`Image processed successfully: ${outputDir}`);
@@ -66,8 +83,12 @@ export class ImageService {
   private async processOriginal(
     inputPath: string,
     outputDir: string,
+    baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
-    const outputPath = path.join(outputDir, 'original.jpg');
+    const fileName = baseFilename
+      ? `${baseFilename}-original.jpg`
+      : 'original.jpg';
+    const outputPath = path.join(outputDir, fileName);
 
     const image = sharp(inputPath);
     const metadata = await image.metadata();
@@ -91,8 +112,12 @@ export class ImageService {
   private async generatePreview(
     inputPath: string,
     outputDir: string,
+    baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
-    const outputPath = path.join(outputDir, 'preview.jpg');
+    const fileName = baseFilename
+      ? `${baseFilename}-preview.jpg`
+      : 'preview.jpg';
+    const outputPath = path.join(outputDir, fileName);
 
     await sharp(inputPath)
       .resize(IMAGE_PROCESSING.PREVIEW_WIDTH, IMAGE_PROCESSING.PREVIEW_HEIGHT, {
@@ -119,8 +144,10 @@ export class ImageService {
   private async generateMedium(
     inputPath: string,
     outputDir: string,
+    baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
-    const outputPath = path.join(outputDir, 'medium.jpg');
+    const fileName = baseFilename ? `${baseFilename}-medium.jpg` : 'medium.jpg';
+    const outputPath = path.join(outputDir, fileName);
 
     await sharp(inputPath)
       .resize(IMAGE_PROCESSING.MEDIUM_WIDTH, IMAGE_PROCESSING.MEDIUM_HEIGHT, {
@@ -147,8 +174,12 @@ export class ImageService {
   private async generateThumbnail(
     inputPath: string,
     outputDir: string,
+    baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
-    const outputPath = path.join(outputDir, 'thumbnail.jpg');
+    const fileName = baseFilename
+      ? `${baseFilename}-thumbnail.jpg`
+      : 'thumbnail.jpg';
+    const outputPath = path.join(outputDir, fileName);
 
     await sharp(inputPath)
       .resize(

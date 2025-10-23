@@ -16,6 +16,8 @@ export class EntityGalleryImageDto {
   originalName: string;
   uploadedAt: Date;
   tags: string[];
+  isPrimary: boolean;
+  displayOrder?: number | null;
   urls: {
     original: string;
     preview?: string;

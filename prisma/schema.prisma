@@ -72,6 +72,8 @@ model Asset {
   
   // Status e Controle
   status       AssetStatus @default(PROCESSING)
+  isPrimary    Boolean     @default(false) // Flag para imagem principal
+  displayOrder Int?        @db.Int         // Ordem de exibição (1 = primeiro)
   
   // Auditoria
   uploadedAt   DateTime @default(now())
@@ -90,6 +92,8 @@ model Asset {
   @@index([fileType, status], name: "idx_type_status")
   @@index([uploadedAt], name: "idx_uploaded")
   @@index([deletedAt], name: "idx_deleted")
+  @@index([entityType, entityId, isPrimary], name: "idx_entity_primary")
+  @@index([entityType, entityId, displayOrder], name: "idx_entity_order")
   @@map("assets")
 }
 
