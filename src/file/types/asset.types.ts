@@ -11,6 +11,8 @@ export interface AssetWithVersionsAndTags {
   fileSize: number;
   basePath: string;
   status: AssetStatus;
+  isPrimary: boolean;
+  displayOrder?: number | null;
   uploadedAt: Date;
   deletedAt?: Date | null;
   metadata: any;
