@@ -20,6 +20,8 @@ export class FileResponseDto {
   status: AssetStatus;
   uploadedAt: Date;
   tags: string[];
+  isPrimary: boolean;
+  displayOrder?: number | null;
 
   versions: AssetVersionDto[];
 

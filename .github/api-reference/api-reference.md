@@ -69,5 +69,3 @@ Para informações detalhadas sobre tratamento de erros, sistema de imagem princ
 - **[Códigos de Erro](./docs/error-codes.md)** - Códigos HTTP e mensagens de erro
 - **[Sistema de Imagem Principal](./docs/primary-image-system.md)** - Documentação completa do sistema de gerenciamento de imagens
 - **[Configuração](./docs/configuration.md)** - Variáveis de ambiente e configuração da API
-
-

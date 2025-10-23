@@ -321,6 +321,7 @@ LOG_FORMAT=json
 **Causa**: String de conexão incorreta
 
 **Solução**:
+
 - Verifique usuario:senha
 - Verifique o hostname e porta
 - Verifique o nome do banco de dados
@@ -330,6 +331,7 @@ LOG_FORMAT=json
 **Causa**: A porta configurada já está em uso
 
 **Solução**:
+
 ```bash
 # Mude a porta no .env
 APP_PORT=5574
@@ -344,6 +346,7 @@ kill -9 <PID>
 **Causa**: Header `x-api-key` não foi incluído
 
 **Solução**:
+
 ```bash
 curl -H "x-api-key: YOUR_API_SECRET_KEY" http://localhost:5573/api/file
 ```
@@ -353,6 +356,7 @@ curl -H "x-api-key: YOUR_API_SECRET_KEY" http://localhost:5573/api/file
 **Causa**: Diretório de upload não existe
 
 **Solução**:
+
 ```bash
 mkdir -p ./upload/images
 mkdir -p ./upload/documents

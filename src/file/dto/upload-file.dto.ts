@@ -4,6 +4,9 @@ import {
   IsArray,
   IsString,
   IsNotEmpty,
+  IsBoolean,
+  IsInt,
+  Min,
 } from 'class-validator';
 import { EntityType } from '../../../generated/prisma';
 
@@ -27,4 +30,13 @@ export class UploadFileDto {
   @IsOptional()
   @IsString()
   altText?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isPrimary?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  displayOrder?: number;
 }

@@ -23,7 +23,7 @@ import {
   getDateParts,
 } from './helpers/path-builder.helper';
 import { determineFileType, isImage } from './helpers/file-validation.helper';
-import { AssetStatus, FileType } from '../../generated/prisma';
+import { AssetStatus, FileType, EntityType } from '../../generated/prisma';
 import { envs } from '../core/config/envs';
 import { AssetWithVersionsAndTags, AssetVersion } from './types/asset.types';
 import { ProcessedImage } from '../image/image.service';
@@ -32,6 +32,10 @@ import {
   EntityGalleryResponseDto,
   EntityGalleryImageDto,
 } from './dto/entity-gallery.dto';
+import {
+  UpdatePrimaryImageDto,
+  ReorderImagesDto,
+} from './dto/update-primary-image.dto';
 
 @Injectable()
 export class FileService {
@@ -72,9 +76,32 @@ export class FileService {
       // Create directory
       await this.storage.ensureDirectoryExists(fullBasePath);
 
-      // Save original file
-      const originalPath = getFullFilePath(fullBasePath, sanitizedName);
-      await this.storage.moveFile(file.path, originalPath);
+      // Get base filename without extension for image versions
+      const baseFilename = sanitizedName.replace(/\.[^.]+$/, '');
+
+      // For images, we'll let the image service handle the original file
+      // For non-images, save the original file
+      if (!isImage(file.mimetype) || fileType !== FileType.IMAGE) {
+        const originalPath = getFullFilePath(fullBasePath, sanitizedName);
+        await this.storage.moveFile(file.path, originalPath);
+      }
+
+      // Check if this should be the primary image
+      const shouldBePrimary = await this.shouldSetAsPrimary(
+        dto.entityType,
+        dto.entityId,
+        dto.isPrimary,
+      );
+
+      // Get next display order if not provided
+      const displayOrder =
+        dto.displayOrder ??
+        (await this.getNextDisplayOrder(dto.entityType, dto.entityId));
+
+      // If setting as primary, unset other primary images
+      if (shouldBePrimary) {
+        await this.unsetCurrentPrimary(dto.entityType, dto.entityId);
+      }
 
       // Create asset record
       await this.prisma.asset.create({
@@ -89,6 +116,8 @@ export class FileService {
           fileSize: file.size,
           basePath,
           status: AssetStatus.PROCESSING,
+          isPrimary: shouldBePrimary,
+          displayOrder,
           metadata: {
             description: dto.description,
             altText: dto.altText,
@@ -98,7 +127,12 @@ export class FileService {
 
       // Process image if applicable
       if (isImage(file.mimetype) && fileType === FileType.IMAGE) {
-        await this.processImageVersions(fileId, originalPath, fullBasePath);
+        await this.processImageVersions(
+          fileId,
+          file.path,
+          fullBasePath,
+          baseFilename,
+        );
       } else {
         // For non-images, just create original version
         await this.createOriginalVersion(
@@ -160,10 +194,12 @@ export class FileService {
     assetId: string,
     originalPath: string,
     outputDir: string,
+    baseFilename: string,
   ): Promise<void> {
     const processed: ProcessedImage = await this.imageService.processImage(
       originalPath,
       outputDir,
+      baseFilename,
     );
 
     // Create version records
@@ -180,7 +216,7 @@ export class FileService {
       {
         assetId,
         versionType: 'original',
-        fileName: 'original.jpg',
+        fileName: `${baseFilename}-original.jpg`,
         filePath: processed.original.path,
         fileSize: processed.original.size,
         width: processed.original.width,
@@ -193,7 +229,7 @@ export class FileService {
       versions.push({
         assetId,
         versionType: 'preview',
-        fileName: 'preview.jpg',
+        fileName: `${baseFilename}-preview.jpg`,
         filePath: processed.preview.path,
         fileSize: processed.preview.size,
         width: processed.preview.width,
@@ -206,7 +242,7 @@ export class FileService {
       versions.push({
         assetId,
         versionType: 'medium',
-        fileName: 'medium.jpg',
+        fileName: `${baseFilename}-medium.jpg`,
         filePath: processed.medium.path,
         fileSize: processed.medium.size,
         width: processed.medium.width,
@@ -219,7 +255,7 @@ export class FileService {
       versions.push({
         assetId,
         versionType: 'thumbnail',
-        fileName: 'thumbnail.jpg',
+        fileName: `${baseFilename}-thumbnail.jpg`,
         filePath: processed.thumbnail.path,
         fileSize: processed.thumbnail.size,
         width: processed.thumbnail.width,
@@ -341,7 +377,11 @@ export class FileService {
         versions: true,
         tags: true,
       },
-      orderBy: { uploadedAt: 'asc' }, // First uploaded images first for product gallery
+      orderBy: [
+        { isPrimary: 'desc' }, // Primary image first
+        { displayOrder: 'asc' }, // Then by display order
+        { uploadedAt: 'asc' }, // Finally by upload date
+      ],
       take: 7, // Maximum 7 images for e-commerce gallery
     });
 
@@ -365,7 +405,7 @@ export class FileService {
           versionType: v.versionType,
           fileName: v.fileName,
           url: buildPublicUrl(
-            envs.EXTERNAL_API_ASSETS_URL,
+            envs.EXTERNAL_ASSETS_BASE_URL,
             asset.fileType,
             dateParts.year,
             dateParts.month,
@@ -389,6 +429,8 @@ export class FileService {
         originalName: asset.originalName,
         uploadedAt: asset.uploadedAt,
         tags: asset.tags.map((t) => t.tag),
+        isPrimary: asset.isPrimary,
+        displayOrder: asset.displayOrder,
         urls: urls as {
           original: string;
           preview?: string;
@@ -451,6 +493,211 @@ export class FileService {
   }
 
   /**
+   * Set primary image for entity
+   */
+  async setPrimaryImage(
+    dto: UpdatePrimaryImageDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const { entityType, entityId, assetId, displayOrder } = dto;
+
+    // Verify asset exists and belongs to entity
+    const asset = await this.prisma.asset.findFirst({
+      where: {
+        id: assetId,
+        entityType,
+        entityId,
+        fileType: FileType.IMAGE,
+        status: AssetStatus.ACTIVE,
+        deletedAt: null,
+      },
+    });
+
+    if (!asset) {
+      throw new NotFoundException(
+        `Image asset ${assetId} not found for ${entityType}:${entityId}`,
+      );
+    }
+
+    // Unset current primary image
+    await this.unsetCurrentPrimary(entityType, entityId);
+
+    // Set new primary image
+    await this.prisma.asset.update({
+      where: { id: assetId },
+      data: {
+        isPrimary: true,
+        displayOrder: displayOrder || 1,
+      },
+    });
+
+    // Log operation
+    await this.prisma.assetLog.create({
+      data: {
+        assetId,
+        operation: 'set_primary',
+        ipAddress,
+        userAgent,
+        metadata: {
+          entityType,
+          entityId,
+          displayOrder,
+        },
+      },
+    });
+
+    this.logger.log(
+      `Primary image set for ${entityType}:${entityId} -> ${assetId}`,
+    );
+
+    return {
+      success: true,
+      message: 'Primary image updated successfully',
+    };
+  }
+
+  /**
+   * Reorder images for entity
+   */
+  async reorderImages(
+    dto: ReorderImagesDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const { entityType, entityId, assetIds } = dto;
+
+    // Verify all assets exist and belong to entity
+    const assets = await this.prisma.asset.findMany({
+      where: {
+        id: { in: assetIds },
+        entityType,
+        entityId,
+        fileType: FileType.IMAGE,
+        status: AssetStatus.ACTIVE,
+        deletedAt: null,
+      },
+    });
+
+    if (assets.length !== assetIds.length) {
+      throw new BadRequestException(
+        `Some assets not found or don't belong to ${entityType}:${entityId}`,
+      );
+    }
+
+    // Update display order
+    const updatePromises = assetIds.map((assetId, index) =>
+      this.prisma.asset.update({
+        where: { id: assetId },
+        data: { displayOrder: index + 1 },
+      }),
+    );
+
+    await Promise.all(updatePromises);
+
+    // Log operation
+    await this.prisma.assetLog.create({
+      data: {
+        assetId: assetIds[0], // Use first asset for logging
+        operation: 'reorder_images',
+        ipAddress,
+        userAgent,
+        metadata: {
+          entityType,
+          entityId,
+          newOrder: assetIds,
+        },
+      },
+    });
+
+    this.logger.log(
+      `Images reordered for ${entityType}:${entityId} - ${assetIds.length} images`,
+    );
+
+    return {
+      success: true,
+      message: 'Images reordered successfully',
+    };
+  }
+
+  /**
+   * Helper: Check if image should be set as primary
+   */
+  private async shouldSetAsPrimary(
+    entityType: EntityType,
+    entityId: string,
+    isPrimaryRequested?: boolean,
+  ): Promise<boolean> {
+    // If explicitly requested as primary
+    if (isPrimaryRequested === true) {
+      return true;
+    }
+
+    // If explicitly requested as NOT primary
+    if (isPrimaryRequested === false) {
+      return false;
+    }
+
+    // Auto-set as primary if no images exist for this entity
+    const existingImagesCount = await this.prisma.asset.count({
+      where: {
+        entityType,
+        entityId,
+        fileType: FileType.IMAGE,
+        status: AssetStatus.ACTIVE,
+        deletedAt: null,
+      },
+    });
+
+    return existingImagesCount === 0;
+  }
+
+  /**
+   * Helper: Get next display order for entity
+   */
+  private async getNextDisplayOrder(
+    entityType: EntityType,
+    entityId: string,
+  ): Promise<number> {
+    const lastAsset = await this.prisma.asset.findFirst({
+      where: {
+        entityType,
+        entityId,
+        fileType: FileType.IMAGE,
+        status: AssetStatus.ACTIVE,
+        deletedAt: null,
+        displayOrder: { not: null },
+      },
+      orderBy: { displayOrder: 'desc' },
+      select: { displayOrder: true },
+    });
+
+    return (lastAsset?.displayOrder || 0) + 1;
+  }
+
+  /**
+   * Helper: Unset current primary image for entity
+   */
+  private async unsetCurrentPrimary(
+    entityType: EntityType,
+    entityId: string,
+  ): Promise<void> {
+    await this.prisma.asset.updateMany({
+      where: {
+        entityType,
+        entityId,
+        fileType: FileType.IMAGE,
+        isPrimary: true,
+        status: AssetStatus.ACTIVE,
+        deletedAt: null,
+      },
+      data: {
+        isPrimary: false,
+      },
+    });
+  }
+
+  /**
    * Map Prisma asset to response DTO
    */
   private mapToResponseDto(asset: AssetWithVersionsAndTags): FileResponseDto {
@@ -461,7 +708,7 @@ export class FileService {
         versionType: v.versionType,
         fileName: v.fileName,
         url: buildPublicUrl(
-          envs.EXTERNAL_API_ASSETS_URL,
+          envs.EXTERNAL_ASSETS_BASE_URL,
           asset.fileType,
           dateParts.year,
           dateParts.month,
@@ -491,6 +738,8 @@ export class FileService {
       status: asset.status,
       uploadedAt: asset.uploadedAt,
       tags: asset.tags.map((t) => t.tag),
+      isPrimary: asset.isPrimary,
+      displayOrder: asset.displayOrder ?? undefined,
       versions,
       urls: urls as {
         original: string;
