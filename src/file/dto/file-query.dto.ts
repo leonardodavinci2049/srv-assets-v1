@@ -1,4 +1,4 @@
-import { IsOptional, IsEnum, IsUUID, IsInt, Min } from 'class-validator';
+import { IsOptional, IsEnum, IsString, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EntityType, FileType, AssetStatus } from '../../../generated/prisma';
 
@@ -8,7 +8,7 @@ export class FileQueryDto {
   entityType?: EntityType;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   entityId?: string;
 
   @IsOptional()

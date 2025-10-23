@@ -33,6 +33,8 @@ enum EntityType {
   INVOICE      // Notas fiscais
   BANNER       // Banners promocionais
   LOGO         // Logos da empresa
+  CATEGORY     // Imagens de categorias
+  BRAND       // Imagens de marcas
   GALLERY      // Galeria geral
   OTHER        // Outros tipos
 }
