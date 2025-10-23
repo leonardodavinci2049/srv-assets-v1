@@ -26,6 +26,7 @@ export class FileResponseDto {
   urls: {
     original: string;
     preview?: string;
+    medium?: string;
     thumbnail?: string;
   };
 }

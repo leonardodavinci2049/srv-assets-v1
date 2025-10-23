@@ -14,6 +14,7 @@ export interface ProcessedImageVersion {
 export interface ProcessedImage {
   original: ProcessedImageVersion;
   preview?: ProcessedImageVersion;
+  medium?: ProcessedImageVersion;
   thumbnail?: ProcessedImageVersion;
 }
 
@@ -39,6 +40,11 @@ export class ImageService {
       // Generate preview if enabled
       if (IMAGE_PROCESSING.GENERATE_PREVIEW) {
         result.preview = await this.generatePreview(inputPath, outputDir);
+      }
+
+      // Generate medium if enabled
+      if (IMAGE_PROCESSING.GENERATE_MEDIUM) {
+        result.medium = await this.generateMedium(inputPath, outputDir);
       }
 
       // Generate thumbnail if enabled
@@ -90,6 +96,34 @@ export class ImageService {
 
     await sharp(inputPath)
       .resize(IMAGE_PROCESSING.PREVIEW_WIDTH, IMAGE_PROCESSING.PREVIEW_HEIGHT, {
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .jpeg({ quality: IMAGE_PROCESSING.COMPRESSION_QUALITY })
+      .toFile(outputPath);
+
+    const metadata = await sharp(outputPath).metadata();
+    const stats = await fs.stat(outputPath);
+
+    return {
+      path: outputPath,
+      width: metadata.width || 0,
+      height: metadata.height || 0,
+      size: stats.size,
+    };
+  }
+
+  /**
+   * Generate medium version (400x400, quality 80%, inside)
+   */
+  private async generateMedium(
+    inputPath: string,
+    outputDir: string,
+  ): Promise<ProcessedImageVersion> {
+    const outputPath = path.join(outputDir, 'medium.jpg');
+
+    await sharp(inputPath)
+      .resize(IMAGE_PROCESSING.MEDIUM_WIDTH, IMAGE_PROCESSING.MEDIUM_HEIGHT, {
         fit: 'inside',
         withoutEnlargement: true,
       })

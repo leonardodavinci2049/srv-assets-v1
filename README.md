@@ -137,10 +137,11 @@ srv-assets-v1/
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/file/upload` | File upload |
-| GET | `/api/file/list` | List assets with filters |
-| GET | `/api/file/:id` | Get specific asset |
-| DELETE | `/api/file/:id` | Delete asset (soft delete) |
+| POST | `/api/file/v1/upload-file` | File upload |
+| POST | `/api/file/v1/list-files` | List assets with filters |
+| POST | `/api/file/v1/find-file` | Get specific asset |
+| POST | `/api/file/v1/delete-file` | Delete asset (soft delete) |
+| POST | `/api/file/v1/entity-gallery` | Get entity image gallery (max 7) |
 
 ### Public
 
@@ -151,7 +152,7 @@ srv-assets-v1/
 ### Upload Example
 
 ```bash
-curl -X POST http://localhost:3000/api/file/upload \
+curl -X POST http://localhost:3000/api/file/v1/upload-file \
   -H "X-API-Key: your-api-key-here" \
   -F "file=@product.jpg" \
   -F "entityType=PRODUCT" \
@@ -174,6 +175,44 @@ curl -X POST http://localhost:3000/api/file/upload \
   }
 }
 ```
+
+### Entity Gallery Example (E-commerce Product Images)
+
+```bash
+curl -X POST http://localhost:3000/api/file/v1/entity-gallery \
+  -H "X-API-Key: your-api-key-here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "entityType": "PRODUCT",
+    "entityId": "550e8400-e29b-41d4-a716-446655440000"
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "entityType": "PRODUCT",
+  "entityId": "550e8400-e29b-41d4-a716-446655440000",
+  "totalImages": 12,
+  "images": [
+    {
+      "id": "img-1-uuid",
+      "originalName": "product-main.jpg",
+      "uploadedAt": "2025-10-23T10:30:00Z",
+      "tags": ["featured", "main"],
+      "urls": {
+        "original": "http://localhost:3000/uploads/images/2025/10/15/{uuid}/original.jpg",
+        "preview": "http://localhost:3000/uploads/images/2025/10/15/{uuid}/preview.jpg",
+        "medium": "http://localhost:3000/uploads/images/2025/10/15/{uuid}/medium.jpg",
+        "thumbnail": "http://localhost:3000/uploads/images/2025/10/15/{uuid}/thumbnail.jpg"
+      }
+    }
+  ]
+}
+```
+
+> **Note:** The gallery endpoint returns maximum 7 images optimized for e-commerce product detail pages. Images are ordered by upload date (oldest first) to maintain consistent primary image ordering.
 
 ---
 
@@ -274,7 +313,7 @@ Main variables (see `.env.example` for complete list):
 
 ```env
 # Application
-APP_API_URL=http://localhost:3000
+EXTERNAL_API_ASSETS_URL=http://localhost:3000
 APP_API_SECRET=your-secret-key-here
 APP_PORT=3000
 NODE_ENV=development

@@ -2,14 +2,12 @@ import {
   Controller,
   Get,
   Post,
-  Delete,
   Body,
-  Param,
-  Query,
   UploadedFile,
   UseInterceptors,
   Req,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -17,7 +15,14 @@ import { FileService } from './file.service';
 import { UploadFileDto } from './dto/upload-file.dto';
 import { FileQueryDto } from './dto/file-query.dto';
 import { FileResponseDto, FileListResponseDto } from './dto/file-response.dto';
+import { FindFileDto } from './dto/find-file.dto';
+import { DeleteFileDto } from './dto/delete-file.dto';
+import {
+  EntityGalleryDto,
+  EntityGalleryResponseDto,
+} from './dto/entity-gallery.dto';
 import { isAllowedMimeType } from './helpers/file-validation.helper';
+import { ApiKeyGuard } from 'src/core/guards/api-key.guard';
 
 type MulterFile = Express.Multer.File;
 
@@ -35,17 +40,20 @@ export class FileController {
       timestamp: new Date().toISOString(),
       endpoints: {
         base: '/api',
-        upload: '/api/file/upload',
-        list: '/api/file/list',
-        getOne: '/api/file/:id',
-        delete: '/api/file/:id',
+        upload: '/api/file/v1/upload-file',
+        list: '/api/file/v1/list-files',
+        getOne: '/api/file/v1/find-file',
+        delete: '/api/file/v1/delete-file',
+        gallery: '/api/file/v1/entity-gallery',
+        note: 'All endpoints require x-api-key header',
       },
     };
   }
 
-  @Post('upload')
+  @Post('v1/upload-file')
+  @UseGuards(ApiKeyGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async upload(
+  async uploadFile(
     @UploadedFile() file: MulterFile | undefined,
     @Body() uploadFileDto: UploadFileDto,
     @Req() req: Request,
@@ -73,24 +81,35 @@ export class FileController {
     );
   }
 
-  @Get('list')
-  async list(@Query() query: FileQueryDto): Promise<FileListResponseDto> {
+  @Post('v1/list-files')
+  @UseGuards(ApiKeyGuard)
+  async listFiles(@Body() query: FileQueryDto): Promise<FileListResponseDto> {
     return await this.fileService.findAll(query);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<FileResponseDto> {
-    return await this.fileService.findOne(id);
+  @Post('v1/find-file')
+  @UseGuards(ApiKeyGuard)
+  async findOne(@Body() body: FindFileDto): Promise<FileResponseDto> {
+    return await this.fileService.findOne(body.id);
   }
 
-  @Delete(':id')
-  async delete(
-    @Param('id') id: string,
+  @Post('v1/delete-file')
+  @UseGuards(ApiKeyGuard)
+  async deleteFile(
+    @Body() body: DeleteFileDto,
     @Req() req: Request,
   ): Promise<{ success: boolean; message: string }> {
     const ipAddress: string | undefined = req.ip || req.socket?.remoteAddress;
     const userAgent: string | undefined = req.headers['user-agent'];
 
-    return await this.fileService.delete(id, ipAddress, userAgent);
+    return await this.fileService.delete(body.id, ipAddress, userAgent);
+  }
+
+  @Post('v1/entity-gallery')
+  @UseGuards(ApiKeyGuard)
+  async getEntityGallery(
+    @Body() body: EntityGalleryDto,
+  ): Promise<EntityGalleryResponseDto> {
+    return await this.fileService.getEntityGallery(body);
   }
 }

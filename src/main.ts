@@ -31,8 +31,10 @@ async function bootstrap() {
 
   await app.listen(process.env.APP_PORT ?? 3000);
   loggerApp.log(`🚀 Application is running on port: ${envs.APP_PORT}`);
-  loggerApp.log(`📚 Documentation: ${envs.APP_API_URL}`);
-  loggerApp.log(`📁 Upload endpoint: ${envs.APP_API_URL}/api/file/upload`);
+  loggerApp.log(`📚 Documentation: ${envs.EXTERNAL_API_ASSETS_URL}`);
+  loggerApp.log(
+    `📁 Upload endpoint: ${envs.EXTERNAL_API_ASSETS_URL}/file/v1/upload-file`,
+  );
 }
 // Start the application
 void bootstrap();
