@@ -638,18 +638,25 @@ export class FileService {
       return false;
     }
 
-    // Auto-set as primary if no images exist for this entity
-    const existingImagesCount = await this.prisma.asset.count({
+    // Check if there's already a primary image for this entity
+    const primaryImageExists = await this.prisma.asset.findFirst({
       where: {
         entityType,
         entityId,
         fileType: FileType.IMAGE,
+        isPrimary: true,
         status: AssetStatus.ACTIVE,
         deletedAt: null,
       },
     });
 
-    return existingImagesCount === 0;
+    // If primary image exists, don't set this one as primary
+    if (primaryImageExists) {
+      return false;
+    }
+
+    // If no primary image exists, set this one as primary (even if other non-primary images exist)
+    return true;
   }
 
   /**
