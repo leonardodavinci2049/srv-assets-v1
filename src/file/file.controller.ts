@@ -68,6 +68,8 @@ export class FileController {
       throw new BadRequestException('No file uploaded');
     }
 
+    // console.log('Uploaded file:', file.originalname, file.mimetype, file.size);
+    // console.log('UploadFileDto:', uploadFileDto);
     // Validate MIME type
     const mimeType = file.mimetype;
     if (!mimeType || !isAllowedMimeType(mimeType)) {
