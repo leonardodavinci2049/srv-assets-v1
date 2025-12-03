@@ -20,7 +20,7 @@ import {
   buildFilePath,
   getFullFilePath,
   buildPublicUrl,
-  getDateParts,
+  extractDatePartsFromPath,
 } from './helpers/path-builder.helper';
 import { determineFileType, isImage } from './helpers/file-validation.helper';
 import { AssetStatus, FileType, EntityType } from '../../generated/prisma';
@@ -398,7 +398,7 @@ export class FileService {
 
     // Map to gallery response format
     const images: EntityGalleryImageDto[] = assets.map((asset) => {
-      const dateParts = getDateParts();
+      const dateParts = extractDatePartsFromPath(asset.basePath);
 
       const versions: AssetVersionDto[] = asset.versions.map(
         (v: AssetVersion) => ({
@@ -708,7 +708,7 @@ export class FileService {
    * Map Prisma asset to response DTO
    */
   private mapToResponseDto(asset: AssetWithVersionsAndTags): FileResponseDto {
-    const dateParts = getDateParts();
+    const dateParts = extractDatePartsFromPath(asset.basePath);
 
     const versions: AssetVersionDto[] = asset.versions.map(
       (v: AssetVersion) => ({
