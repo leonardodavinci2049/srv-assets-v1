@@ -1,5 +1,5 @@
-import * as path from 'path';
-import { FileType } from '../../../generated/prisma';
+import * as path from 'node:path';
+import type { FileType } from '../../../generated/prisma';
 
 /**
  * Build file path following the structure:
@@ -58,5 +58,29 @@ export function getDateParts(): { year: number; month: string; day: string } {
     year: now.getFullYear(),
     month: String(now.getMonth() + 1).padStart(2, '0'),
     day: String(now.getDate()).padStart(2, '0'),
+  };
+}
+
+/**
+ * Extract date parts from basePath
+ * Example: upload/images/2025/12/02/uuid -> { year: 2025, month: '12', day: '02' }
+ */
+export function extractDatePartsFromPath(basePath: string): {
+  year: number;
+  month: string;
+  day: string;
+} {
+  const parts = basePath.split(path.sep);
+  // Expected format: upload/images/YYYY/MM/DD/uuid
+  const yearIndex = parts.findIndex((part) => /^\d{4}$/.test(part));
+
+  if (yearIndex === -1 || yearIndex + 2 >= parts.length) {
+    throw new Error(`Invalid basePath format: ${basePath}`);
+  }
+
+  return {
+    year: Number.parseInt(parts[yearIndex], 10),
+    month: parts[yearIndex + 1],
+    day: parts[yearIndex + 2],
   };
 }
