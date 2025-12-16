@@ -4,6 +4,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
@@ -216,7 +217,7 @@ export class FileService {
       {
         assetId,
         versionType: 'original',
-        fileName: `${baseFilename}-original.jpg`,
+        fileName: path.basename(processed.original.path),
         filePath: processed.original.path,
         fileSize: processed.original.size,
         width: processed.original.width,
@@ -229,7 +230,7 @@ export class FileService {
       versions.push({
         assetId,
         versionType: 'preview',
-        fileName: `${baseFilename}-preview.jpg`,
+        fileName: path.basename(processed.preview.path),
         filePath: processed.preview.path,
         fileSize: processed.preview.size,
         width: processed.preview.width,
@@ -242,7 +243,7 @@ export class FileService {
       versions.push({
         assetId,
         versionType: 'medium',
-        fileName: `${baseFilename}-medium.jpg`,
+        fileName: path.basename(processed.medium.path),
         filePath: processed.medium.path,
         fileSize: processed.medium.size,
         width: processed.medium.width,
@@ -255,7 +256,7 @@ export class FileService {
       versions.push({
         assetId,
         versionType: 'thumbnail',
-        fileName: `${baseFilename}-thumbnail.jpg`,
+        fileName: path.basename(processed.thumbnail.path),
         filePath: processed.thumbnail.path,
         fileSize: processed.thumbnail.size,
         width: processed.thumbnail.width,

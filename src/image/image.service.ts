@@ -85,17 +85,17 @@ export class ImageService {
     outputDir: string,
     baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
+    const ext = path.extname(inputPath);
     const fileName = baseFilename
-      ? `${baseFilename}-original.jpg`
-      : 'original.jpg';
+      ? `${baseFilename}-original${ext}`
+      : `original${ext}`;
     const outputPath = path.join(outputDir, fileName);
 
-    const image = sharp(inputPath);
-    const metadata = await image.metadata();
+    // Copy file instead of processing with sharp to preserve quality
+    await fs.copyFile(inputPath, outputPath);
 
-    // Save original with metadata
-    await image.toFile(outputPath);
-
+    // Get metadata for the record
+    const metadata = await sharp(inputPath).metadata();
     const stats = await fs.stat(outputPath);
 
     return {
@@ -107,98 +107,141 @@ export class ImageService {
   }
 
   /**
-   * Generate preview version (800x600, quality 80%)
+   * Generate preview version (800x600, quality 90%)
    */
   private async generatePreview(
     inputPath: string,
     outputDir: string,
     baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
+    const metadata = await sharp(inputPath).metadata();
+    const isPng = metadata.format === 'png';
+    const ext = isPng ? '.png' : '.jpg';
+
     const fileName = baseFilename
-      ? `${baseFilename}-preview.jpg`
-      : 'preview.jpg';
+      ? `${baseFilename}-preview${ext}`
+      : `preview${ext}`;
     const outputPath = path.join(outputDir, fileName);
 
-    await sharp(inputPath)
-      .resize(IMAGE_PROCESSING.PREVIEW_WIDTH, IMAGE_PROCESSING.PREVIEW_HEIGHT, {
+    let pipeline = sharp(inputPath).resize(
+      IMAGE_PROCESSING.PREVIEW_WIDTH,
+      IMAGE_PROCESSING.PREVIEW_HEIGHT,
+      {
         fit: 'inside',
         withoutEnlargement: true,
-      })
-      .jpeg({ quality: IMAGE_PROCESSING.COMPRESSION_QUALITY })
-      .toFile(outputPath);
+      },
+    );
 
-    const metadata = await sharp(outputPath).metadata();
+    if (isPng) {
+      pipeline = pipeline.png({ compressionLevel: 9 });
+    } else {
+      pipeline = pipeline.jpeg({
+        quality: IMAGE_PROCESSING.COMPRESSION_QUALITY,
+      });
+    }
+
+    await pipeline.toFile(outputPath);
+
+    const outputMetadata = await sharp(outputPath).metadata();
     const stats = await fs.stat(outputPath);
 
     return {
       path: outputPath,
-      width: metadata.width || 0,
-      height: metadata.height || 0,
+      width: outputMetadata.width || 0,
+      height: outputMetadata.height || 0,
       size: stats.size,
     };
   }
 
   /**
-   * Generate medium version (400x400, quality 80%, inside)
+   * Generate medium version (400x400, quality 90%, inside)
    */
   private async generateMedium(
     inputPath: string,
     outputDir: string,
     baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
-    const fileName = baseFilename ? `${baseFilename}-medium.jpg` : 'medium.jpg';
+    const metadata = await sharp(inputPath).metadata();
+    const isPng = metadata.format === 'png';
+    const ext = isPng ? '.png' : '.jpg';
+
+    const fileName = baseFilename
+      ? `${baseFilename}-medium${ext}`
+      : `medium${ext}`;
     const outputPath = path.join(outputDir, fileName);
 
-    await sharp(inputPath)
-      .resize(IMAGE_PROCESSING.MEDIUM_WIDTH, IMAGE_PROCESSING.MEDIUM_HEIGHT, {
+    let pipeline = sharp(inputPath).resize(
+      IMAGE_PROCESSING.MEDIUM_WIDTH,
+      IMAGE_PROCESSING.MEDIUM_HEIGHT,
+      {
         fit: 'inside',
         withoutEnlargement: true,
-      })
-      .jpeg({ quality: IMAGE_PROCESSING.COMPRESSION_QUALITY })
-      .toFile(outputPath);
+      },
+    );
 
-    const metadata = await sharp(outputPath).metadata();
+    if (isPng) {
+      pipeline = pipeline.png({ compressionLevel: 9 });
+    } else {
+      pipeline = pipeline.jpeg({
+        quality: IMAGE_PROCESSING.COMPRESSION_QUALITY,
+      });
+    }
+
+    await pipeline.toFile(outputPath);
+
+    const outputMetadata = await sharp(outputPath).metadata();
     const stats = await fs.stat(outputPath);
 
     return {
       path: outputPath,
-      width: metadata.width || 0,
-      height: metadata.height || 0,
+      width: outputMetadata.width || 0,
+      height: outputMetadata.height || 0,
       size: stats.size,
     };
   }
 
   /**
-   * Generate thumbnail version (200x200, quality 80%, cover)
+   * Generate thumbnail version (200x200, quality 90%, cover)
    */
   private async generateThumbnail(
     inputPath: string,
     outputDir: string,
     baseFilename?: string,
   ): Promise<ProcessedImageVersion> {
+    const metadata = await sharp(inputPath).metadata();
+    const isPng = metadata.format === 'png';
+    const ext = isPng ? '.png' : '.jpg';
+
     const fileName = baseFilename
-      ? `${baseFilename}-thumbnail.jpg`
-      : 'thumbnail.jpg';
+      ? `${baseFilename}-thumbnail${ext}`
+      : `thumbnail${ext}`;
     const outputPath = path.join(outputDir, fileName);
 
-    await sharp(inputPath)
-      .resize(
-        IMAGE_PROCESSING.THUMBNAIL_WIDTH,
-        IMAGE_PROCESSING.THUMBNAIL_HEIGHT,
-        {
-          fit: 'cover',
-        },
-      )
-      .jpeg({ quality: IMAGE_PROCESSING.COMPRESSION_QUALITY })
-      .toFile(outputPath);
+    let pipeline = sharp(inputPath).resize(
+      IMAGE_PROCESSING.THUMBNAIL_WIDTH,
+      IMAGE_PROCESSING.THUMBNAIL_HEIGHT,
+      {
+        fit: 'cover',
+      },
+    );
 
-    const metadata = await sharp(outputPath).metadata();
+    if (isPng) {
+      pipeline = pipeline.png({ compressionLevel: 9 });
+    } else {
+      pipeline = pipeline.jpeg({
+        quality: IMAGE_PROCESSING.COMPRESSION_QUALITY,
+      });
+    }
+
+    await pipeline.toFile(outputPath);
+
+    const outputMetadata = await sharp(outputPath).metadata();
     const stats = await fs.stat(outputPath);
 
     return {
       path: outputPath,
-      width: metadata.width || 0,
-      height: metadata.height || 0,
+      width: outputMetadata.width || 0,
+      height: outputMetadata.height || 0,
       size: stats.size,
     };
   }
