@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '../../generated/prisma/client.js';
+import { PrismaClient } from '../generated/prisma/client.js';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
 @Injectable()
@@ -7,15 +7,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const connectionUrl = new URL(process.env.DATABASE_URL!);
-    const adapter = new PrismaMariaDb({
-      host: connectionUrl.hostname,
-      port: Number(connectionUrl.port) || 3306,
-      user: connectionUrl.username,
-      password: connectionUrl.password,
-      database: connectionUrl.pathname.slice(1),
+    const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
+    super({
+      adapter,
+      log: ['warn', 'error'],
     });
-    super({ adapter, log: ['warn', 'error'] });
   }
 
   async onModuleInit() {

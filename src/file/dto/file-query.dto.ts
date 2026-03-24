@@ -4,7 +4,7 @@ import {
   EntityType,
   FileType,
   AssetStatus,
-} from '../../../generated/prisma/client.js';
+} from '../../generated/prisma/client.js';
 
 export class FileQueryDto {
   @IsOptional()

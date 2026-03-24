@@ -1,5 +1,5 @@
 import { fileTypeFromBuffer } from 'file-type';
-import { FileType } from '../../../generated/prisma/client.js';
+import { FileType } from '../../generated/prisma/client.js';
 
 /**
  * Allowed MIME types configuration
