@@ -23,15 +23,8 @@ import {
   buildPublicUrl,
   extractDatePartsFromPath,
 } from './helpers/path-builder.helper.js';
-import {
-  determineFileType,
-  isImage,
-} from './helpers/file-validation.helper.js';
-import {
-  AssetStatus,
-  FileType,
-  EntityType,
-} from '../generated/prisma/client.js';
+import { determineFileType, isImage } from './helpers/file-validation.helper.js';
+import { AssetStatus, FileType, EntityType } from '../generated/prisma/client.js';
 import { envs } from '../core/config/envs.js';
 import { AssetWithVersionsAndTags, AssetVersion } from './types/asset.types.js';
 import { ProcessedImage } from '../image/image.service.js';

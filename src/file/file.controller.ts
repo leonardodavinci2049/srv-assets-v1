@@ -14,10 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service.js';
 import { UploadFileDto } from './dto/upload-file.dto.js';
 import { FileQueryDto } from './dto/file-query.dto.js';
-import {
-  FileResponseDto,
-  FileListResponseDto,
-} from './dto/file-response.dto.js';
+import { FileResponseDto, FileListResponseDto } from './dto/file-response.dto.js';
 import { FindFileDto } from './dto/find-file.dto.js';
 import { DeleteFileDto } from './dto/delete-file.dto.js';
 import {

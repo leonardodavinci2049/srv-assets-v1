@@ -1,8 +1,4 @@
-import {
-  FileType,
-  AssetStatus,
-  EntityType,
-} from '../../generated/prisma/client.js';
+import { FileType, AssetStatus, EntityType } from '../../generated/prisma/client.js';
 
 export class AssetVersionDto {
   versionType: string;
