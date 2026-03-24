@@ -8,7 +8,7 @@ import {
   IsInt,
   Min,
 } from 'class-validator';
-import { EntityType } from '../../../generated/prisma';
+import { EntityType } from '../../../generated/prisma/client.js';
 
 export class UploadFileDto {
   @IsEnum(EntityType)

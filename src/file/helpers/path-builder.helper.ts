@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import type { FileType } from '../../../generated/prisma';
+import type { FileType } from '../../../generated/prisma/client.js';
 
 /**
  * Build file path following the structure:

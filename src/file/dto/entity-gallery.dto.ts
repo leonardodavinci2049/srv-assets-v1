@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
-import { EntityType } from '../../../generated/prisma';
+import { EntityType } from '../../../generated/prisma/client.js';
 
 export class EntityGalleryDto {
   @IsEnum(EntityType)

@@ -1,4 +1,8 @@
-import { AssetStatus, FileType, EntityType } from '../../../generated/prisma';
+import {
+  AssetStatus,
+  FileType,
+  EntityType,
+} from '../../../generated/prisma/client.js';
 
 export interface AssetWithVersionsAndTags {
   id: string;

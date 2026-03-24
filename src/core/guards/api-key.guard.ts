@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
   Logger,
 } from '@nestjs/common';
-import { envs } from '../config/envs';
+import { envs } from '../config/envs.js';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
