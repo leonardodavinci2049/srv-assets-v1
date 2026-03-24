@@ -1,12 +1,15 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '../../generated/prisma';
+import { PrismaClient } from '../generated/prisma/client.js';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
+    const adapter = new PrismaMariaDb(process.env.DATABASE_URL!);
     super({
+      adapter,
       log: ['warn', 'error'],
     });
   }

@@ -1,4 +1,4 @@
-import * as joi from 'joi';
+import joi from 'joi';
 
 interface EnvVars {
   EXTERNAL_API_ASSETS_URL: string;

@@ -11,22 +11,25 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileService } from './file.service';
-import { UploadFileDto } from './dto/upload-file.dto';
-import { FileQueryDto } from './dto/file-query.dto';
-import { FileResponseDto, FileListResponseDto } from './dto/file-response.dto';
-import { FindFileDto } from './dto/find-file.dto';
-import { DeleteFileDto } from './dto/delete-file.dto';
+import { FileService } from './file.service.js';
+import { UploadFileDto } from './dto/upload-file.dto.js';
+import { FileQueryDto } from './dto/file-query.dto.js';
+import {
+  FileResponseDto,
+  FileListResponseDto,
+} from './dto/file-response.dto.js';
+import { FindFileDto } from './dto/find-file.dto.js';
+import { DeleteFileDto } from './dto/delete-file.dto.js';
 import {
   EntityGalleryDto,
   EntityGalleryResponseDto,
-} from './dto/entity-gallery.dto';
+} from './dto/entity-gallery.dto.js';
 import {
   UpdatePrimaryImageDto,
   ReorderImagesDto,
-} from './dto/update-primary-image.dto';
-import { isAllowedMimeType } from './helpers/file-validation.helper';
-import { ApiKeyGuard } from 'src/core/guards/api-key.guard';
+} from './dto/update-primary-image.dto.js';
+import { isAllowedMimeType } from './helpers/file-validation.helper.js';
+import { ApiKeyGuard } from '../core/guards/api-key.guard.js';
 
 type MulterFile = Express.Multer.File;
 

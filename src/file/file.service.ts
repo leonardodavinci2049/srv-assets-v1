@@ -6,37 +6,44 @@ import {
 } from '@nestjs/common';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaService } from '../prisma/prisma.service';
-import { StorageService } from '../storage/storage.service';
-import { ImageService } from '../image/image.service';
-import { UploadFileDto } from './dto/upload-file.dto';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { StorageService } from '../storage/storage.service.js';
+import { ImageService } from '../image/image.service.js';
+import { UploadFileDto } from './dto/upload-file.dto.js';
 import {
   FileResponseDto,
   FileListResponseDto,
   AssetVersionDto,
-} from './dto/file-response.dto';
-import { FileQueryDto } from './dto/file-query.dto';
-import { sanitizeFilename } from './helpers/file-naming.helper';
+} from './dto/file-response.dto.js';
+import { FileQueryDto } from './dto/file-query.dto.js';
+import { sanitizeFilename } from './helpers/file-naming.helper.js';
 import {
   buildFilePath,
   getFullFilePath,
   buildPublicUrl,
   extractDatePartsFromPath,
-} from './helpers/path-builder.helper';
-import { determineFileType, isImage } from './helpers/file-validation.helper';
-import { AssetStatus, FileType, EntityType } from '../../generated/prisma';
-import { envs } from '../core/config/envs';
-import { AssetWithVersionsAndTags, AssetVersion } from './types/asset.types';
-import { ProcessedImage } from '../image/image.service';
+} from './helpers/path-builder.helper.js';
+import {
+  determineFileType,
+  isImage,
+} from './helpers/file-validation.helper.js';
+import {
+  AssetStatus,
+  FileType,
+  EntityType,
+} from '../generated/prisma/client.js';
+import { envs } from '../core/config/envs.js';
+import { AssetWithVersionsAndTags, AssetVersion } from './types/asset.types.js';
+import { ProcessedImage } from '../image/image.service.js';
 import {
   EntityGalleryDto,
   EntityGalleryResponseDto,
   EntityGalleryImageDto,
-} from './dto/entity-gallery.dto';
+} from './dto/entity-gallery.dto.js';
 import {
   UpdatePrimaryImageDto,
   ReorderImagesDto,
-} from './dto/update-primary-image.dto';
+} from './dto/update-primary-image.dto.js';
 
 @Injectable()
 export class FileService {

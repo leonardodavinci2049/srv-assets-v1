@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import sharp from 'sharp';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { IMAGE_PROCESSING } from '../core/config/upload.config';
+import { IMAGE_PROCESSING } from '../core/config/upload.config.js';
 
 export interface ProcessedImageVersion {
   path: string;
