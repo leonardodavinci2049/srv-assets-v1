@@ -23,10 +23,10 @@ import { join } from 'path';
       serveRoot: '/',
     }),
 
-    // Serve upload files at /upload
+    // Serve upload files at /uploads
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../../..', 'upload'),
-      serveRoot: '/upload',
+      serveRoot: '/uploads',
       serveStaticOptions: {
         index: false,
         cacheControl: true,
