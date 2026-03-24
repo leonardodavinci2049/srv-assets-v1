@@ -18,15 +18,15 @@ import { join } from 'path';
 
     // Serve pageroot at root /
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../..', 'pageroot'),
+      rootPath: join(__dirname, '../../..', 'pageroot'),
       exclude: ['/api/*'],
       serveRoot: '/',
     }),
 
-    // Serve upload files at /uploads
+    // Serve upload files at /upload
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../..', 'upload'),
-      serveRoot: '/uploads',
+      rootPath: join(__dirname, '../../..', 'upload'),
+      serveRoot: '/upload',
       serveStaticOptions: {
         index: false,
         cacheControl: true,
