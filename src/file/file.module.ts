@@ -3,14 +3,14 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { FileService } from './file.service';
-import { FileController } from './file.controller';
-import { StorageModule } from '../storage/storage.module';
-import { ImageModule } from '../image/image.module';
+import { FileService } from './file.service.js';
+import { FileController } from './file.controller.js';
+import { StorageModule } from '../storage/storage.module.js';
+import { ImageModule } from '../image/image.module.js';
 import {
   TEMP_UPLOAD_DIR,
   FILE_SIZE_LIMITS,
-} from '../core/config/upload.config';
+} from '../core/config/upload.config.js';
 
 @Module({
   imports: [
