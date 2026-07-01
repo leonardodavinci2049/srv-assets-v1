@@ -72,7 +72,7 @@ export class ImageService {
       this.logger.log(`Image processed successfully: ${outputDir}`);
       return result;
     } catch (error) {
-      this.logger.error(`Failed to process image: ${error}`);
+      this.logger.error(`Failed to process image: ${(error as Error).message}`);
       throw error;
     }
   }
