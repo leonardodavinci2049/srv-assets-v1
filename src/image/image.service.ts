@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import sharp from 'sharp';
+import type { Metadata } from 'sharp';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { IMAGE_PROCESSING } from '../core/config/upload.config.js';
@@ -249,7 +250,7 @@ export class ImageService {
   /**
    * Get image metadata
    */
-  async getImageMetadata(filePath: string): Promise<sharp.Metadata> {
+  async getImageMetadata(filePath: string): Promise<Metadata> {
     return await sharp(filePath).metadata();
   }
 
