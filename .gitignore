@@ -68,3 +68,4 @@ ecosystem.config.cjs
 .github
 /src/generated/prisma
 /scripts
+.agents
