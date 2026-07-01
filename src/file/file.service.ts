@@ -190,7 +190,7 @@ export class FileService {
       // Return response
       return await this.findOne(fileId);
     } catch (error) {
-      this.logger.error(`Upload failed: ${error}`);
+      this.logger.error(`Upload failed: ${(error as Error).message}`);
       throw error;
     }
   }
