@@ -67,3 +67,4 @@ ecosystem.config.cjs
 /flow
 .github
 /src/generated/prisma
+/scripts
