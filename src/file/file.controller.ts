@@ -13,7 +13,7 @@ import type { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service.js';
 import { UploadFileDto } from './dto/upload-file.dto.js';
-import { FileQueryDto } from './dto/file-query.dto.js';
+import { ListFilesDto } from './dto/list-files.dto.js';
 import {
   FileResponseDto,
   FileListResponseDto,
@@ -94,7 +94,7 @@ export class FileController {
 
   @Post('v1/list-files')
   @UseGuards(ApiKeyGuard)
-  async listFiles(@Body() query: FileQueryDto): Promise<FileListResponseDto> {
+  async listFiles(@Body() query: ListFilesDto): Promise<FileListResponseDto> {
     return await this.fileService.findAll(query);
   }
 

@@ -6,7 +6,7 @@ import {
   AssetStatus,
 } from '../../generated/prisma/client.js';
 
-export class FileQueryDto {
+export class ListFilesDto {
   @IsOptional()
   @IsEnum(EntityType)
   entityType?: EntityType;
