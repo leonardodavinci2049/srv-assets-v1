@@ -234,7 +234,7 @@ export type AssetVersionGroupByOutputType = {
   _max: AssetVersionMaxAggregateOutputType | null
 }
 
-type GetAssetVersionGroupByPayload<T extends AssetVersionGroupByArgs> = Prisma.PrismaPromise<
+export type GetAssetVersionGroupByPayload<T extends AssetVersionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AssetVersionGroupByOutputType, T['by']> &
       {
