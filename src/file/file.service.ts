@@ -15,7 +15,7 @@ import {
   FileListResponseDto,
   AssetVersionDto,
 } from './dto/file-response.dto.js';
-import { FileQueryDto } from './dto/file-query.dto.js';
+import { ListFilesDto } from './dto/list-files.dto.js';
 import { sanitizeFilename } from './helpers/file-naming.helper.js';
 import {
   buildFilePath,
@@ -301,7 +301,7 @@ export class FileService {
   /**
    * Find all assets with filters
    */
-  async findAll(query: FileQueryDto): Promise<FileListResponseDto> {
+  async findAll(query: ListFilesDto): Promise<FileListResponseDto> {
     const {
       entityType,
       entityId,

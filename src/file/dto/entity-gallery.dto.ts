@@ -1,6 +1,13 @@
 import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 import { EntityType } from '../../generated/prisma/client.js';
 
+/*
+Sample JSON for testing in body endpoint:
+{
+  "entityType": "PRODUCT",
+  "entityId": "00000000-0000-4000-8000-000000000001"
+}
+*/
 export class EntityGalleryDto {
   @IsEnum(EntityType)
   @IsNotEmpty()
