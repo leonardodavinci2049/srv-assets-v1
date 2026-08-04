@@ -6,6 +6,17 @@ import {
   AssetStatus,
 } from '../../generated/prisma/client.js';
 
+/*
+Sample JSON for testing in body endpoint:
+{
+  "entityType": "PRODUCT",
+  "entityId": "00000000-0000-4000-8000-000000000001",
+  "fileType": "IMAGE",
+  "status": "ACTIVE",
+  "page": 1,
+  "limit": 20
+}
+*/
 export class ListFilesDto {
   @IsOptional()
   @IsEnum(EntityType)

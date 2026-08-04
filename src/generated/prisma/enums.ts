@@ -26,6 +26,11 @@ export const EntityType = {
   LOGO: 'LOGO',
   CATEGORY: 'CATEGORY',
   BRAND: 'BRAND',
+  CUSTOMER: 'CUSTOMER',
+  SELLER: 'SELLER',
+  PTYPE: 'PTYPE',
+  SUPPLIERS: 'SUPPLIERS',
+  CARRIER: 'CARRIER',
   GALLERY: 'GALLERY',
   OTHER: 'OTHER'
 } as const
