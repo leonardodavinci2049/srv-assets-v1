@@ -34,6 +34,11 @@ enum EntityType {
   LOGO         // Logos da empresa
   CATEGORY     // Imagens de categorias
   BRAND       // Imagens de marcas
+  CUSTOMER     // Imagens de clientes
+  SELLER       // Imagens de vendedores
+  PTYPE        // Imagens de tipos de pessoa
+  SUPPLIERS    // Imagens de fornecedores
+  CARRIER      // Imagens de transportadoras
   GALLERY      // Galeria geral
   OTHER        // Outros tipos
 }
@@ -187,4 +192,3 @@ model SystemConfig {
   
   @@map("system_config")
 }
-

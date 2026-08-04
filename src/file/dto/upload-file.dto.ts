@@ -10,6 +10,18 @@ import {
 } from 'class-validator';
 import { EntityType } from '../../generated/prisma/client.js';
 
+/*
+Sample JSON for testing in body endpoint (multipart fields; send the file separately):
+{
+  "entityType": "PRODUCT",
+  "entityId": "00000000-0000-4000-8000-000000000001",
+  "tags": ["test", "product"],
+  "description": "Test asset upload",
+  "altText": "Test product image",
+  "isPrimary": true,
+  "displayOrder": 1
+}
+*/
 export class UploadFileDto {
   @IsEnum(EntityType)
   entityType: EntityType;
