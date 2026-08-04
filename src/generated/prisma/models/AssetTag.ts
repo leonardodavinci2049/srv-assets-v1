@@ -150,7 +150,7 @@ export type AssetTagGroupByOutputType = {
   _max: AssetTagMaxAggregateOutputType | null
 }
 
-type GetAssetTagGroupByPayload<T extends AssetTagGroupByArgs> = Prisma.PrismaPromise<
+export type GetAssetTagGroupByPayload<T extends AssetTagGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AssetTagGroupByOutputType, T['by']> &
       {
