@@ -69,3 +69,5 @@ ecosystem.config.cjs
 /src/generated/prisma
 /scripts
 .agents
+/API-documentation/
+/API-assets-documentation/
