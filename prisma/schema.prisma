@@ -46,7 +46,7 @@ enum EntityType {
 
 // ============================================
 // ENUM: Status do Asset
-// ============================================
+// ===========================================
 enum AssetStatus {
   ACTIVE       // Ativo e disponível
   PROCESSING   // Em processamento (thumbnails, etc)
