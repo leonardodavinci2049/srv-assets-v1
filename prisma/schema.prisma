@@ -26,6 +26,7 @@ enum FileType {
 // ENUM: Categorias de Entidade
 // ============================================
 enum EntityType {
+  APP          // Imagens da aplicação
   PRODUCT      // Imagens de produtos
   PROFILE      // Fotos de perfil
   ORDER        // Documentos de pedidos

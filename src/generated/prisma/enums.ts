@@ -18,6 +18,7 @@ export type FileType = (typeof FileType)[keyof typeof FileType]
 
 
 export const EntityType = {
+  APP: 'APP',
   PRODUCT: 'PRODUCT',
   PROFILE: 'PROFILE',
   ORDER: 'ORDER',
